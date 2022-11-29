@@ -1,15 +1,25 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
+const { createJWT } = require("../utils");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
   const emailAlreadyExists = await User.findOne({ email }); // returns a promise with a boolean value.
-  if (!emailAlreadyExists) {
+
+  if (emailAlreadyExists) {
     throw new CustomError.BadRequestError("Email already exist");
   }
-  const user = await User.create({ name, email, password });
-  res.status(StatusCodes.OK).json({ user });
+  const isFirstAccount = (await User.countDocuments({})) === 0;
+  const role = isFirstAccount ? "admin" : "user";
+
+  //creating the user.
+  const user = await User.create({ name, email, password, role });
+  // creating a tokenUser from the user.
+  const tokenUser = { name: user.name, userId: user._id, role: user.role };
+  // creating a token
+  const token = createJWT({ payload: tokenUser });
+  res.status(StatusCodes.OK).json({ user: tokenUser, token });
 };
 
 const login = async (req, res) => {
