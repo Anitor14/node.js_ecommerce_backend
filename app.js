@@ -17,7 +17,7 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 // to access middleware we use app.use().
 app.use(morgan("tiny"));
 app.use(express.json()); //we want to have access to the json data in our req.body.
-app.use(cookieParser()); // enables us to have access to cookies in the req.cookies.
+app.use(cookieParser(process.env.JWT_SECRET)); // enables us to have access to cookies in the req.cookies.
 
 app.get("/", (req, res) => {
   // console.log(req.cookies);
@@ -25,7 +25,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/v1", (req, res) => {
-  console.log(req.cookies);
+  // console.log(req.cookies);
+  console.log(req.signedCookies);
   res.send("e-commerce api");
 });
 
