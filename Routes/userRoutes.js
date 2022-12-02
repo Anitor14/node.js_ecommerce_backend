@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { authenticateUser } = require("../middleware/authentication");
+const {
+  authenticateUser,
+  authorizePermissions,
+} = require("../middleware/authentication");
 
 const {
   getAllUsers,
@@ -10,7 +13,8 @@ const {
   updateUserPassword,
 } = require("../controllers/userController");
 
-router.route("/").get(authenticateUser, getAllUsers);
+// we first authenticate the user and then we can check for the admin.
+router.route("/").get(authenticateUser, authorizePermissions, getAllUsers);
 
 router.route("/showMe").get(showCurrentUser);
 router.route("/updateUser").patch(updateUser);
