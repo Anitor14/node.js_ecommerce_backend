@@ -53,7 +53,7 @@ const logout = async (req, res) => {
 };
 
 module.exports = {
-  register,
+  register, //exporting the register,login and logout routes.
   login,
   logout,
 };
