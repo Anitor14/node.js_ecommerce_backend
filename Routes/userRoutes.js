@@ -14,7 +14,9 @@ const {
 } = require("../controllers/userController");
 
 // we first authenticate the user and then we can check for the admin.
-router.route("/").get(authenticateUser, authorizePermissions, getAllUsers);
+router
+  .route("/")
+  .get(authenticateUser, authorizePermissions("admin", "owner"), getAllUsers);
 
 router.route("/showMe").get(showCurrentUser);
 router.route("/updateUser").patch(updateUser);

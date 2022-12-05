@@ -6,7 +6,7 @@ const getAllUsers = async (req, res) => {
   const users = await User.find({ role: "user" }).select("-password");
   res.status(StatusCodes.OK).json({ users });
 };
-
+// is this love, is this love , that i am feeling , what is the iss
 const getSingleUser = async (req, res) => {
   const {
     params: { id: userId },
