@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { attachCookiesToResponse } = require("../utils");
+const { attachCookiesToResponse, createTokenUser } = require("../utils");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -10,14 +10,15 @@ const register = async (req, res) => {
   if (emailAlreadyExists) {
     throw new CustomError.BadRequestError("Email already exist"); // this happens if the email already exists.
   }
+
   const isFirstAccount = (await User.countDocuments({})) === 0; // check if there is any accounts.
   const role = isFirstAccount ? "admin" : "user";
 
   //creating the user.
   const user = await User.create({ name, email, password, role }); // creating the new user.
   // creating a tokenUser from the user.
-  const tokenUser = { name: user.name, userId: user._id, role: user.role };
-  //attaching the coo
+  const tokenUser = createTokenUser(user);
+  //attaching the cookies to the response
   attachCookiesToResponse({ res, user: tokenUser });
   res.status(StatusCodes.CREATED).json({ user: tokenUser });
 };
@@ -41,9 +42,9 @@ const login = async (req, res) => {
   }
 
   // creating a tokenUser from the user.
-  const tokenUser = { name: user.name, userId: user._id, role: user.role };
+  const tokenUser = createTokenUser(user);
   attachCookiesToResponse({ res, user: tokenUser });
-  res.status(StatusCodes.CREATED).json({ user: tokenUser });
+  res.status(StatusCodes.OK).json({ user: tokenUser });
 };
 
 const logout = async (req, res) => {
