@@ -11,7 +11,7 @@ const authenticateUser = async (req, res, next) => {
   //   we are making the same mistakes that we made, in the time
 
   try {
-    const payload = isTokenValid({ token });
+    const payload = isTokenValid({ token }); // checking if the token is valid.
     const { name, userId, role } = payload;
     req.user = { name, userId, role };
     console.log(req.user);
