@@ -29,7 +29,7 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Please provide product category"],
       enum: ["office", "kitchen", "bedroom"],
     },
-    company: {  
+    company: {
       type: String,
       required: [true, "Please provide product company"],
       enum: {
@@ -65,7 +65,15 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestaps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+ProductSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "product",
+  justOne: false,
+  // match: { rating: 5 },
+});
 
 module.exports = mongoose.model("Product", ProductSchema);
