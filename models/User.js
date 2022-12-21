@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // setting up our pre hook
-// this is what happens before saving our document.
+// this is what happens before saving our user.
 // this points back to the user.
 UserSchema.pre("save", async function () {
   // console.log(this.modifiedPaths()); // shows you the paths that have been modified.
@@ -42,7 +42,7 @@ UserSchema.pre("save", async function () {
 });
 
 //setting up a function that compares this password.
-//setting up instance method.
+//setting up instance method. The instance methods can be used when an instant of the model has been created.
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   const isMatch = await bcrypt.compare(candidatePassword, this.password);
   return isMatch;

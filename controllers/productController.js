@@ -11,13 +11,13 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}).populate("reviews");
   res.status(StatusCodes.OK).json({ products, count: products.length });
 };
 
 const getSingleProduct = async (req, res) => {
   const { id: productId } = req.params;
-  const product = await Product.findOne({ _id: productId }).populate("reviews");
+  const product = await Product.findOne({ _id: productId }).populate("reviews"); // you won't be able to query this because the reviews is a virtual property.
   if (!product) {
     throw new CustomError.NotFoundError(`No Product with id: ${productId}`);
   }
@@ -43,7 +43,7 @@ const deleteProduct = async (req, res) => {
     throw new CustomError.NotFoundError(`No Product with Id: ${productId}`);
   }
 
-  await product.remove();
+  await product.remove(); // this would trigger the pre function in the model, that removes the reviews before it deletes the product.
   res.status(StatusCodes.OK).json({ msg: "Product deleted successfully" });
 };
 

@@ -49,7 +49,7 @@ const showCurrentUser = async (req, res) => {
 // update user with user.save();
 const updateUser = async (req, res) => {
   const { email, name } = req.body; // we get the name and email from req.body.
-  //we check if they are available.
+  //we if the updates are available.
   if (!email || !name) {
     throw new CustomError.BadRequestError("please provide all values");
   }

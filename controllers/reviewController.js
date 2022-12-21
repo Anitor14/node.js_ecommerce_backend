@@ -10,7 +10,7 @@ const createReview = async (req, res) => {
   const { product: productId } = req.body; // we gave our product an alias which is productId
   const { userId } = req.user;
 
-  // find the product with the productId
+  // checking if the product with the productId is valid.
   const isValidProduct = await Product.findOne({ _id: productId });
 
   // return a customError if the Product is not found.
@@ -19,7 +19,7 @@ const createReview = async (req, res) => {
   }
 
   // we want to check if this particular user has made a review concerning this particular product.
-
+  //find the if the Review where the product is equals to the productId and the user equals to the userId exist.
   const alreadySubmitted = await Review.findOne({
     product: productId,
     user: userId,
@@ -85,8 +85,14 @@ const deleteReview = async (req, res) => {
   }
 
   checkPermissions(req.user, review.user); // check if the user has permission to delete this review.
-  await review.remove();
+  await review.remove(); // we are using the remove method to trigger the post hook in the Review Model.
   res.status(StatusCodes.OK).json({ msg: "Success! Review Removed" });
+};
+
+const getSingleProductReviews = async (req, res) => {
+  const { id: productId } = req.params;
+  const reviews = await Review.find({ product: productId });
+  res.status(StatusCodes.OK).json({ reviews, count: reviews.length });
 };
 
 module.exports = {
@@ -95,4 +101,5 @@ module.exports = {
   getSingleReview,
   updateReview,
   deleteReview,
+  getSingleProductReviews,
 };

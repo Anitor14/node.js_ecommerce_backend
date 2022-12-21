@@ -35,5 +35,18 @@ const ReviewSchema = new mongoose.Schema(
 
 // this is to set up compound index, in this case the user can only review a product once.
 ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
+// the static method are created on the schema , not on the instance of the model like instance methods.
+ReviewSchema.statics.calculateAverageRating = async function (productId) {
+  console.log(productId);
+};
 
+ReviewSchema.post("save", async function () {
+  // we are calling the static method calculateAverageRating
+  await this.constructor.calculateAverageRating(this.product);
+});
+
+ReviewSchema.post("remove", async function () {
+  // we are calling the static method calculateAverageRating
+  await this.constructor.calculateAverageRating(this.product);
+});
 module.exports = mongoose.model("Review", ReviewSchema);
