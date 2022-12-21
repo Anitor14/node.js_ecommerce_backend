@@ -37,7 +37,31 @@ const ReviewSchema = new mongoose.Schema(
 ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
 // the static method are created on the schema , not on the instance of the model like instance methods.
 ReviewSchema.statics.calculateAverageRating = async function (productId) {
-  console.log(productId);
+  const result = await this.aggregate([
+    //  we first match the aggregate reviews based on the productId.
+    { $match: { product: productId } },
+    // then we group and find the average rating, and the number of reviews
+    {
+      $group: {
+        _id: null,
+        averageRating: { $avg: "$rating" },
+        numOfReviews: { $sum: 1 },
+      },
+    },
+  ]);
+  console.log(result);
+  try {
+    await this.model("Product").findOneAndUpdate(
+      { _id: productId },
+      {
+        // we are using optional chaining.
+        averageRating: Math.ceil(result[0]?.averageRating || 0),
+        numOfReviews: result[0]?.numOfReviews || 0,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 ReviewSchema.post("save", async function () {
