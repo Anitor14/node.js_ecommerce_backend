@@ -21,16 +21,32 @@ const createOrder = async (req, res) => {
   let orderItems = [];
   let subtotal = 0;
 
+  //we cannot run an asynchronous await function inside a forEach or map function , so we utilize for of.
   for (const item of cartItems) {
-    const dbProduct = await Product.findOne({ _id: item.Product });
+    const dbProduct = await Product.findOne({ _id: item.product });
     if (!dbProduct) {
       throw new CustomError.NotFoundError(
-        `No product with id: ${item.Product}`
+        `No product with id: ${item.product}`
       );
     }
+    const { name, price, image, _id } = dbProduct;
+    console.log(name, price, image);
+
+    const singleOrderItem = {
+      amount: item.amount,
+      name,
+      price,
+      image,
+      product: _id,
+    };
+    // add item to order
+    orderItems = [...orderItems, singleOrderItem];
+    // calculate subtotal
+    subtotal += item.amount * price;
   }
 
-  //we cannot run an asynchronous await function inside a forEach or map function , so we utilize for of.
+  console.log(orderItems);
+  console.log(subtotal);
 
   res.send("create order");
 };
