@@ -5,7 +5,6 @@ const {
   authenticateUser,
   authorizePermissions,
 } = require("../middleware/authentication");
-require("../middleware/authentication");
 
 const {
   createReview,
