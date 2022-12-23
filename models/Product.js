@@ -69,7 +69,7 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestaps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } } //we set up this model to accept virtuals.
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } } //we set up this model to accept virtuals.
 );
 
 ProductSchema.virtual("reviews", {
