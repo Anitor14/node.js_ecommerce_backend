@@ -34,9 +34,7 @@ const createOrder = async (req, res) => {
     // getting the product from the Database with the id that is equals to the item.product.
     const dbProduct = await Product.findOne({ _id: item.product });
     if (!dbProduct) {
-      throw new CustomError.NotFoundError(
-        `No product with id: ${item.product}`
-      );
+      throw new CustomError.NotFoundError(`No product with id:${item.product}`);
     }
     // we get the name, price, image and the id from the dbProduct
     const { name, price, image, _id } = dbProduct;
@@ -71,7 +69,7 @@ const createOrder = async (req, res) => {
     subtotal,
     tax,
     shippingFee,
-    clientSecret: paymentIntent.clientSecret,
+    clientSecret: paymentIntent.client_secret,
     user: req.user.userId,
   });
   res
@@ -79,16 +77,36 @@ const createOrder = async (req, res) => {
     .json({ order, clientSecret: order.clientSecret });
 };
 const getAllOrders = async (req, res) => {
-  res.send("get all orders");
+  const orders = await Order.find({});
+  res.status(StatusCodes.OK).json({ orders, count: orders.length });
 };
 const getSingleOrder = async (req, res) => {
-  res.send("get single orders");
+  const { id: orderId } = req.params;
+  const order = await Order.findOne({ _id: orderId });
+  if (!order) {
+    throw new CustomError.NotFoundError(`No order with id:${orderId}`);
+  }
+  checkPermissions(req.user, order.user);
+  res.status(StatusCodes.OK).json({ order });
 };
 const getCurrentUserOrders = async (req, res) => {
-  res.send("get current user orders");
+  const orders = await Order.find({ user: req.user.userId });
+  res.status(StatusCodes.OK).json({ orders, count: orders.length });
 };
 const updateOrder = async (req, res) => {
-  res.send("update order");
+  const { id: orderId } = req.params;
+  const { paymentIntentId } = req.body;
+
+  const order = await Order.findOne({ id: orderId });
+  if (!order) {
+    throw new CustomError.NotFoundError(`No order with id: ${orderId}`);
+  }
+  checkPermissions(req.user, order.user);
+  order.paymentIntentId = paymentIntentId;
+  order.status = "paid";
+  await order.save();
+
+  res.status(StatusCodes.OK).json({ order });
 };
 module.exports = {
   getAllOrders,
