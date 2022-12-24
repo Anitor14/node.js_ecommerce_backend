@@ -1,7 +1,7 @@
 [
   {
     "tax": 499,
-    "shippingFee": 799,
+    "shippingFee": 799, 
     "items": [
       {
         "name": "bed",
